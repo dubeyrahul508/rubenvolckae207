@@ -1,65 +1,308 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useState } from "react";
 
 export default function Home() {
+  const [familyName, setFamilyName] = useState("");
+  const [husbandIncome, setHusbandIncome] = useState({
+    netIncome: "",
+    childBenefits: "",
+    totalIncome: ""
+  });
+  // const [husbandTotalIncome, setHusbandTotalIncome] = useState("");
+  const [wifeIncome, setWifeIncome] = useState({
+    netIncome: "",
+    childBenefits: "",
+    totalIncome: ""
+  });
+  // const [wifeTotalIncome, setWifeTotalIncome] = useState("");
+  // const [totalIncomeTogether, setTotalIncomeTogether] = useState("");
+  const [inputList, setInputList] = useState([{ childName: "", childAge: "" }]);
+  const [sumOfTheoreticalCost, setSumOfTheoreticalCost] = useState("");
+  const [directCost, setDirectCost] = useState("");
+  const [residenceRateDivisionPercent, setResidenceRateDivisionPercent] = useState({husbandPercent: "",wifePercent: ""})
+
+  // FINAL AMOUNTS
+  const [husbandFinalAmt, setHusbandFinalAmt] = useState({contri_1: "", contri_2: ""})
+  const [wifeFinalAmt, setWifeFinalAmt] = useState({contri_1: "", contri_2: ""})
+
+  // ALL THEORETICAL COST BY AGE
+  const theoreticalCostByAge = {
+    0: 0.137,
+    1: 0.144,
+    2: 0.152,
+    3: 0.159,
+    4: 0.166,
+    5: 0.173,
+    6: 0.181,
+    7: 0.188,
+    8: 0.196,
+    9: 0.204,
+    10: 0.21,
+    11: 0.218,
+    12: 0.225,
+    13: 0.233,
+    14: 0.24,
+    15: 0.247,
+    16: 0.255,
+    17: 0.262,
+    18: 0.27,
+    19: 0.28,
+    20: 0.29,
+    21: 0.3,
+    22: 0.31,
+    23: 0.32,
+    24: 0.33,
+    25: 0.34,
+  };
+  // HANDLE INPUT FIELD OF CHILDRENS'
+  const onChangeChildrenData = (e, index) => {
+    const { name, value } = e.target;
+    const childrenList = [...inputList];
+    childrenList[index][name] = value;
+    setInputList(childrenList);
+  };
+
+  // ADD CHILD FUNCTTION
+  const addChild = () => {
+    setInputList([...inputList, { childName: "", childAge: "" }]);
+  };
+
+  // REMOVE CHILD FUNCTION 
+  const removeChild = (index) => {
+    const childrenList = [...inputList];
+    childrenList.splice(index, 1);
+    setInputList(childrenList);
+  };
+
+  // CALCULATION SUM OF THEORETICAL COST OF ALL CHILDREN
+  const sumOfAllTheoreticalCost = () => {
+    let totalCost = 0;
+    let i;
+    let listLength = inputList.length;
+
+    for (i = 0; i < listLength; i++) {
+      totalCost += theoreticalCostByAge[inputList[i].childAge];
+    }
+    setSumOfTheoreticalCost(totalCost);
+  };
+
+  const handleSubmit = () => {
+    // B21 = SOM(B15 : B19)
+    sumOfAllTheoreticalCost();
+
+    // B7 = B3 + B4
+    let husbandTotalIncome = Number(husbandIncome.netIncome) + Number(husbandIncome.childBenefits);
+
+    // C7 = C3 + C4
+    let wifeTotalIncome = Number(wifeIncome.netIncome) + Number(wifeIncome.childBenefits);
+
+    // B9 = B7 + C7
+    let totalIncome = husbandTotalIncome + wifeTotalIncome;
+
+    // B11 = 1 / (B9 - C4 - B4) * B7
+    let husbandPercentage = 1/(husbandTotalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * husbandTotalIncome;
+
+    // C11 = 1 / (B9 - C4 - B4) * C3
+    let wifePercentage = 1/(husbandTotalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * wifeTotalIncome;
+
+    // D21 = B21 / (1 + B21)
+    let directCostVal = Number(sumOfTheoreticalCost) / (1 + Number(sumOfTheoreticalCost));
+
+    // B23 = B9 * D21
+    let realCostGross = totalIncome * directCostVal;
+
+    // B24 = B23 - (B4 + C4)
+    let realCostChildBenefits = realCostGross - (Number(husbandIncome.childBenefits) + Number(wifeIncome.childBenefits));
+
+    // B30 = B24 * B11
+    let diffInHusbandIncome = realCostChildBenefits * husbandPercentage;
+
+    // B31 = B24 * C11
+    let diffInWifeIncome = realCostChildBenefits * wifePercentage;
+
+    // B36
+    let residenceHusbandPercent = residenceRateDivisionPercent.husbandPercent/100;
+
+    // C36
+    let residenceWifePercent = residenceRateDivisionPercent.wifePercent/100;
+
+    // B37 = B23 * B36
+    let residenceCostHusband =  realCostGross * residenceHusbandPercent;
+
+    // C37 = B23 * C36
+    let residenceCostWife = realCostGross * residenceWifePercent;
+
+    // = B30 - B37
+    let husbandFinalContri_1 = diffInHusbandIncome - residenceCostHusband;
+
+    //  = B29 + B4
+    let husbandFinalContri_2 = husbandFinalContri_1 + Number(husbandIncome.childBenefits);
+
+    // = B31 - C37
+    let wifeFinalContri_1 = diffInWifeIncome - residenceCostWife;
+
+    // = B40 + C4
+    let wifeFinalContri_2 = wifeFinalContri_1 + Number(wifeIncome.childBenefits);
+
+    setHusbandFinalAmt({contri_1: husbandFinalContri_1, contri_2: husbandFinalContri_2});
+    setWifeFinalAmt({contri_1: wifeFinalContri_1, contri_2: wifeFinalContri_2});
+    // setHusbandIncome({...husbandIncome, totalIncome: husbandTotalIncome});
+    // setWifeIncome({...wifeIncome, totalIncome: wifeTotalIncome});
+    // setTotalIncomeTogether(totalIncome);
+    // setDirectCost(directCostVal);
+
+  };
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
+    <>
+      <nav className="navbar navbar-expand-sm bg-dark navbar-dark justify-content-between">
+        <a className="navbar-brand" href="/#">
+          RENARD
         </a>
-      </footer>
-    </div>
-  )
+        <ul className="navbar-nav">
+          <li className="nav-item">
+            <a href="/#" className="nav-link">
+              About Us
+            </a>
+          </li>
+          <li className="nav-item">
+            <a href="/#" className="nav-link">
+              Contact Us
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div className="row justify-content-center mt-5">
+        <div className="col-md-8">
+          <div className="card customCard_style p-5 border-0">
+            <h2 className="card-title text-center py-5">Renard Calculation</h2>
+            <div className="row my-3">
+              <div className="col align-self-end">
+                <p><strong>Net annual Income:</strong></p>
+              </div>
+              <div className="col">
+                <p className="text-center"><strong>Husband</strong></p>
+                <input
+                  className="form-control"
+                  type="number"
+                  value={husbandIncome.netIncome}
+                  name="husbandNetIncome"
+                  onChange={(e) => setHusbandIncome({...husbandIncome,netIncome:e.target.value})}
+                />
+              </div>
+              <div className="col">
+                <p className="text-center"><strong>Wife</strong></p>
+                <input
+                  className="form-control"
+                  type="number"
+                  value={wifeIncome.netIncome}
+                  name="wifeNetIncome"
+                  onChange={(e) => setWifeIncome({...wifeIncome,netIncome:e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className="col"><p><strong>Child benefits:</strong></p></div>
+              <div className="col">
+                <input
+                  className="form-control"
+                  type="number"
+                  value={husbandIncome.childBenefits}
+                  name="husbandChildBenefits"
+                  onChange={(e) => setHusbandIncome({...husbandIncome,childBenefits:e.target.value})}
+                />
+              </div>
+              <div className="col">
+                <input
+                  className="form-control"
+                  type="number"
+                  value={wifeIncome.childBenefits}
+                  name="wifeChildBenefits"
+                  onChange={(e) => setWifeIncome({...wifeIncome,childBenefits:e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className="col"><p><strong>Residence rate division ( in %):</strong></p></div>
+              <div className="col">
+                <input
+                  className="form-control"
+                  type="number"
+                  value={residenceRateDivisionPercent.husbandPercent}
+                  name="husbandResidencePercent"
+                  onChange={(e) => setResidenceRateDivisionPercent({...residenceRateDivisionPercent,husbandPercent:e.target.value})}
+                />
+              </div>
+              <div className="col">
+                <input
+                  className="form-control"
+                  type="number"
+                  value={residenceRateDivisionPercent.wifePercent}
+                  name="wifeResidencePercent"
+                  onChange={(e) => setResidenceRateDivisionPercent({...residenceRateDivisionPercent,wifePercent:e.target.value})}
+                />
+              </div>
+            </div>
+            {inputList.map((val, i) => (
+              <div className="row" key={i}>
+                <div className="col-md-5">
+                  <label>Child Name</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    value={val.childName}
+                    name="childName"
+                    onChange={(e) => onChangeChildrenData(e, i)}
+                  />
+                </div>
+                <div className="col-md-5">
+                  <label>Child Age</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={val.childAge}
+                    name="childAge"
+                    onChange={(e) => onChangeChildrenData(e, i)}
+                  />
+                </div>
+                <div className="col-md-2 align-self-end">
+                  {i === inputList.length - 1 ? (
+                    <button
+                      className="btn btn-success mr-3"
+                      onClick={addChild}
+                    >
+                      +
+                    </button>
+                  ) : (
+                    <></>
+                  )}
+
+                  {inputList.length > 1 ? (
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => removeChild(i)}
+                    >
+                      &times;
+                    </button>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
+            ))}
+              <h5 className="my-3"><strong>Final Amounts:</strong> </h5>
+              <div className="row">
+                <div className="col"><p><strong>Father/Husband:</strong></p></div>
+                <div className="col">{husbandFinalAmt.contri_1}</div>
+                <div className="col">{husbandFinalAmt.contri_2}</div>
+              </div>
+              <div className="row">
+                <div className="col"><p><strong>Mother/Wife:</strong></p></div>
+                <div className="col">{wifeFinalAmt.contri_1}</div>
+                <div className="col">{wifeFinalAmt.contri_2}</div>
+              </div>
+            <button className="btn btn-outline-primary" onClick={handleSubmit}>Calculate</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
