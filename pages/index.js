@@ -91,57 +91,75 @@ export default function Home() {
 
     // B7 = B3 + B4
     let husbandTotalIncome = Number(husbandIncome.netIncome) + Number(husbandIncome.childBenefits);
+    console.log(husbandTotalIncome, "husbandTotalIncome", typeof husbandTotalIncome);
 
     // C7 = C3 + C4
     let wifeTotalIncome = Number(wifeIncome.netIncome) + Number(wifeIncome.childBenefits);
+    console.log(wifeTotalIncome, "wifeTotalIncome");
 
     // B9 = B7 + C7
     let totalIncome = husbandTotalIncome + wifeTotalIncome;
+    console.log(totalIncome, "totalIncome");
 
     // B11 = 1 / (B9 - C4 - B4) * B7
     let husbandPercentage = 1/(husbandTotalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * husbandTotalIncome;
+    console.log(husbandPercentage, "husbandPercentage");
 
     // C11 = 1 / (B9 - C4 - B4) * C3
     let wifePercentage = 1/(husbandTotalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * wifeTotalIncome;
+    console.log(wifePercentage, "wifePercentage");
 
     // D21 = B21 / (1 + B21)
     let directCostVal = Number(sumOfTheoreticalCost) / (1 + Number(sumOfTheoreticalCost));
+    console.log(directCostVal, "directCostVal");
 
     // B23 = B9 * D21
     let realCostGross = totalIncome * directCostVal;
+    console.log(realCostGross, "realCostGross");
 
     // B24 = B23 - (B4 + C4)
     let realCostChildBenefits = realCostGross - (Number(husbandIncome.childBenefits) + Number(wifeIncome.childBenefits));
+    console.log(realCostChildBenefits, "realCostChildBenefits");
 
     // B30 = B24 * B11
     let diffInHusbandIncome = realCostChildBenefits * husbandPercentage;
+    console.log(diffInHusbandIncome, "diffInHusbandIncome");
 
     // B31 = B24 * C11
     let diffInWifeIncome = realCostChildBenefits * wifePercentage;
+    console.log(diffInWifeIncome, "diffInWifeIncome")
 
     // B36
     let residenceHusbandPercent = residenceRateDivisionPercent.husbandPercent/100;
+    console.log(residenceHusbandPercent, "residenceHusbandPercent");
 
     // C36
     let residenceWifePercent = residenceRateDivisionPercent.wifePercent/100;
+    console.log(residenceWifePercent, "residenceWifePercent")
 
     // B37 = B23 * B36
     let residenceCostHusband =  realCostGross * residenceHusbandPercent;
+    console.log(residenceCostHusband, "residenceCostHusband")
 
     // C37 = B23 * C36
     let residenceCostWife = realCostGross * residenceWifePercent;
+    console.log(residenceCostWife, "residenceCostWife")
 
     // = B30 - B37
     let husbandFinalContri_1 = diffInHusbandIncome - residenceCostHusband;
+    console.log(husbandFinalContri_1,"husbandFinalContri_1", typeof husbandFinalContri_1)
 
     //  = B29 + B4
     let husbandFinalContri_2 = husbandFinalContri_1 + Number(husbandIncome.childBenefits);
+    console.log(husbandFinalContri_2, "husbandFinalContri_2")
 
     // = B31 - C37
     let wifeFinalContri_1 = diffInWifeIncome - residenceCostWife;
+    console.log(wifeFinalContri_1, "wifeFinalContri_1")
 
     // = B40 + C4
     let wifeFinalContri_2 = wifeFinalContri_1 + Number(wifeIncome.childBenefits);
+    console.log(wifeFinalContri_2, "wifeFinalContri_2")
 
     setHusbandFinalAmt({contri_1: husbandFinalContri_1, contri_2: husbandFinalContri_2});
     setWifeFinalAmt({contri_1: wifeFinalContri_1, contri_2: wifeFinalContri_2});
