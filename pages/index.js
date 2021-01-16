@@ -73,8 +73,10 @@ export default function Home() {
     setInputList(childrenList);
   };
 
-  // CALCULATION SUM OF THEORETICAL COST OF ALL CHILDREN
-  const sumOfAllTheoreticalCost = () => {
+  const handleSubmit = () => {
+    // B21 = SOM(B15 : B19)
+    /////////////////////////////////////
+    // CALCULATION SUM OF THEORETICAL COST OF ALL CHILDREN
     let totalCost = 0;
     let i;
     let listLength = inputList.length;
@@ -82,13 +84,8 @@ export default function Home() {
     for (i = 0; i < listLength; i++) {
       totalCost += theoreticalCostByAge[inputList[i].childAge];
     }
-    setSumOfTheoreticalCost(totalCost);
-  };
-
-  const handleSubmit = () => {
-    // B21 = SOM(B15 : B19)
-    sumOfAllTheoreticalCost();
-
+    // setSumOfTheoreticalCost(totalCost);
+    /////////////////////////////////////
     // B7 = B3 + B4
     let husbandTotalIncome = Number(husbandIncome.netIncome) + Number(husbandIncome.childBenefits);
     console.log(husbandTotalIncome, "husbandTotalIncome", typeof husbandTotalIncome);
@@ -110,7 +107,7 @@ export default function Home() {
     console.log(wifePercentage, "wifePercentage");
 
     // D21 = B21 / (1 + B21)
-    let directCostVal = Number(sumOfTheoreticalCost) / (1 + Number(sumOfTheoreticalCost));
+    let directCostVal = Number(totalCost) / (1 + Number(totalCost));
     console.log(directCostVal, "directCostVal");
 
     // B23 = B9 * D21
