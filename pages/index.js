@@ -20,7 +20,8 @@ export default function Home() {
   const [directCost, setDirectCost] = useState("");
   const [realGrossCost, setRealGrossCost] = useState("")
   const [realGrossCostChildBenefits, setRealGrossCostChildBenefits] = useState("")
-  const [residenceCost, setResidenceCost] = useState({husband:"",wife:""})
+  const [residenceCostHusb, setResidenceCostHusb] = useState("");
+  const [residenceCostWfe, setResidenceCostWfe] = useState("");
   const [residenceRateDivisionPercent, setResidenceRateDivisionPercent] = useState({husbandPercent: "",wifePercent: ""})
 
   // FINAL AMOUNTS
@@ -143,12 +144,12 @@ export default function Home() {
     // B37 = B23 * B36
     let residenceCostHusband =  realCostGross * residenceHusbandPercent;
     console.log(residenceCostHusband, "residenceCostHusband")
-    setResidenceCost({...residenceCost,husband:residenceCostHusband})
+    setResidenceCostHusb(residenceCostHusband)
 
     // C37 = B23 * C36
     let residenceCostWife = realCostGross * residenceWifePercent;
     console.log(residenceCostWife, "residenceCostWife")
-    setResidenceCost({...residenceCost,wife:residenceCostWife})
+    setResidenceCostWfe(residenceCostWife)
 
     // = B30 - B37
     let husbandFinalContri_1 = diffInHusbandIncome - residenceCostHusband;
@@ -317,13 +318,13 @@ export default function Home() {
                 <div className="col"><p><strong>Child Age</strong></p></div>
                 <div className="col"><p><strong>Theoretical Cost</strong></p></div>
               </div>
-              {inputList.map(val=>{
+              {inputList.map(val=>(
                 <div className="row">
                   <div className="col">{val.childName}</div>
                   <div className="col">{val.childAge}</div>
                   <div className="col">{theoreticalCostByAge[val.childAge]}</div>
                 </div>
-              })}
+              ))}
               <hr/>
               <h5 className="my-3"><strong>Total Theoretical Cost:</strong> {sumOfTheoreticalCost}</h5>
               <hr/>
@@ -333,16 +334,14 @@ export default function Home() {
               <hr/>
               <h5 className="my-3"><strong>Real Cost Gross( in Child Benefits):</strong> {realGrossCostChildBenefits} </h5>
               <hr/>
-              <h5 className="my-3"><strong>Real Cost Gross( in Child Benefits):</strong> {realGrossCostChildBenefits} </h5>
-              <hr/>
               <h5 className="my-3"><strong>Residence Cost:</strong> </h5>
               <div className="row">
                 <div className="col"><p><strong>Father/Husband:</strong></p></div>
-                <div className="col">{residenceCost.husband}</div>
+                <div className="col">{residenceCostHusb}</div>
               </div>
               <div className="row">
                 <div className="col"><p><strong>Mother/Wife:</strong></p></div>
-                <div className="col">{residenceCost.wife}</div>
+                <div className="col">{residenceCostWfe}</div>
               </div>
               <hr/>
               <h5 className="my-3"><strong>Final Amounts:</strong> </h5>
