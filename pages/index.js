@@ -18,6 +18,9 @@ export default function Home() {
   const [inputList, setInputList] = useState([{ childName: "", childAge: "" }]);
   const [sumOfTheoreticalCost, setSumOfTheoreticalCost] = useState("");
   const [directCost, setDirectCost] = useState("");
+  const [realGrossCost, setRealGrossCost] = useState("")
+  const [realGrossCostChildBenefits, setRealGrossCostChildBenefits] = useState("")
+  const [residenceCost, setResidenceCost] = useState({husband:"",wife:""})
   const [residenceRateDivisionPercent, setResidenceRateDivisionPercent] = useState({husbandPercent: "",wifePercent: ""})
 
   // FINAL AMOUNTS
@@ -84,7 +87,7 @@ export default function Home() {
     for (i = 0; i < listLength; i++) {
       totalCost += theoreticalCostByAge[inputList[i].childAge];
     }
-    // setSumOfTheoreticalCost(totalCost);
+    setSumOfTheoreticalCost(totalCost);
     /////////////////////////////////////
     // B7 = B3 + B4
     let husbandTotalIncome = Number(husbandIncome.netIncome) + Number(husbandIncome.childBenefits);
@@ -108,15 +111,18 @@ export default function Home() {
 
     // D21 = B21 / (1 + B21)
     let directCostVal = Number(totalCost) / (1 + Number(totalCost));
+    setDirectCost(directCostVal)
     console.log(directCostVal, "directCostVal");
 
     // B23 = B9 * D21
     let realCostGross = totalIncome * directCostVal;
     console.log(realCostGross, "realCostGross");
+    setRealGrossCost(realCostGross);
 
     // B24 = B23 - (B4 + C4)
     let realCostChildBenefits = realCostGross - (Number(husbandIncome.childBenefits) + Number(wifeIncome.childBenefits));
     console.log(realCostChildBenefits, "realCostChildBenefits");
+    setRealGrossCostChildBenefits(realCostChildBenefits);
 
     // B30 = B24 * B11
     let diffInHusbandIncome = realCostChildBenefits * husbandPercentage;
@@ -137,10 +143,12 @@ export default function Home() {
     // B37 = B23 * B36
     let residenceCostHusband =  realCostGross * residenceHusbandPercent;
     console.log(residenceCostHusband, "residenceCostHusband")
+    setResidenceCost({...residenceCost,husband:residenceCostHusband})
 
     // C37 = B23 * C36
     let residenceCostWife = realCostGross * residenceWifePercent;
     console.log(residenceCostWife, "residenceCostWife")
+    setResidenceCost({...residenceCost,wife:residenceCostWife})
 
     // = B30 - B37
     let husbandFinalContri_1 = diffInHusbandIncome - residenceCostHusband;
@@ -303,15 +311,49 @@ export default function Home() {
                 </div>
               </div>
             ))}
+              <h5 className="my-3"><strong>Children Details:</strong> </h5>
+              <div className="row">
+                <div className="col"><p><strong>Child Name</strong></p></div>
+                <div className="col"><p><strong>Child Age</strong></p></div>
+                <div className="col"><p><strong>Theoretical Cost</strong></p></div>
+              </div>
+              {inputList.map(val=>{
+                <div className="row">
+                  <div className="col">{val.childName}</div>
+                  <div className="col">{val.childAge}</div>
+                  <div className="col">{theoreticalCostByAge[val.childAge]}</div>
+                </div>
+              })}
+              <hr/>
+              <h5 className="my-3"><strong>Total Theoretical Cost:</strong> {sumOfTheoreticalCost}</h5>
+              <hr/>
+              <h5 className="my-3"><strong>Direct Cost:</strong> {directCost} </h5>
+              <hr/>
+              <h5 className="my-3"><strong>Real Cost Gross:</strong> {realGrossCost} </h5>
+              <hr/>
+              <h5 className="my-3"><strong>Real Cost Gross( in Child Benefits):</strong> {realGrossCostChildBenefits} </h5>
+              <hr/>
+              <h5 className="my-3"><strong>Real Cost Gross( in Child Benefits):</strong> {realGrossCostChildBenefits} </h5>
+              <hr/>
+              <h5 className="my-3"><strong>Residence Cost:</strong> </h5>
+              <div className="row">
+                <div className="col"><p><strong>Father/Husband:</strong></p></div>
+                <div className="col">{residenceCost.husband}</div>
+              </div>
+              <div className="row">
+                <div className="col"><p><strong>Mother/Wife:</strong></p></div>
+                <div className="col">{residenceCost.wife}</div>
+              </div>
+              <hr/>
               <h5 className="my-3"><strong>Final Amounts:</strong> </h5>
               <div className="row">
                 <div className="col"><p><strong>Father/Husband:</strong></p></div>
-                <div className="col">{husbandFinalAmt.contri_1}</div>
+                {/* <div className="col">{husbandFinalAmt.contri_1}</div> */}
                 <div className="col">{husbandFinalAmt.contri_2}</div>
               </div>
               <div className="row">
                 <div className="col"><p><strong>Mother/Wife:</strong></p></div>
-                <div className="col">{wifeFinalAmt.contri_1}</div>
+                {/* <div className="col">{wifeFinalAmt.contri_1}</div> */}
                 <div className="col">{wifeFinalAmt.contri_2}</div>
               </div>
             <button className="btn btn-outline-primary" onClick={handleSubmit}>Calculate</button>
