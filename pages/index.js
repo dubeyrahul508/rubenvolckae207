@@ -344,16 +344,24 @@ export default function Home() {
                 <div className="col">{residenceCostWfe}</div>
               </div>
               <hr/>
-              <h5 className="my-3"><strong>Final Amounts:</strong> </h5>
+              <h5 className="my-3"><strong>Annual Final Amounts:</strong> </h5>
               <div className="row">
                 <div className="col"><p><strong>Father/Husband:</strong></p></div>
-                {/* <div className="col">{husbandFinalAmt.contri_1}</div> */}
-                <div className="col">{husbandFinalAmt.contri_2}</div>
+                {husbandFinalAmt.contri_2>0&&<div className="col">{husbandFinalAmt.contri_2}</div>}
               </div>
               <div className="row">
                 <div className="col"><p><strong>Mother/Wife:</strong></p></div>
-                {/* <div className="col">{wifeFinalAmt.contri_1}</div> */}
-                <div className="col">{wifeFinalAmt.contri_2}</div>
+                {wifeFinalAmt.contri_2>0&&<div className="col">{wifeFinalAmt.contri_2}</div>}
+              </div>
+              <hr/>
+              <h5 className="my-3"><strong>Monthly Final Amounts:</strong> </h5>
+              <div className="row">
+              {husbandFinalAmt.contri_2>0&&<div className="col"><p><strong>Father/Husband:</strong></p></div>}
+                <div className="col">{husbandFinalAmt.contri_2/12}</div>
+              </div>
+              <div className="row">
+                <div className="col"><p><strong>Mother/Wife:</strong></p></div>
+                {wifeFinalAmt.contri_2&&<div className="col">{wifeFinalAmt.contri_2/12}</div>}
               </div>
             <button className="btn btn-outline-primary" onClick={handleSubmit}>Calculate</button>
           </div>
