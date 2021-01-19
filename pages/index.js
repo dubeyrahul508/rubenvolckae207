@@ -99,11 +99,11 @@ export default function Home() {
     console.log(totalIncome, "totalIncome");
 
     // B11 = 1 / (B9 - C4 - B4) * B7
-    let husbandPercentage = 1/(husbandTotalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * husbandTotalIncome;
+    let husbandPercentage = 1/(totalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * husbandTotalIncome;
     console.log(husbandPercentage, "husbandPercentage");
 
     // C11 = 1 / (B9 - C4 - B4) * C3
-    let wifePercentage = 1/(husbandTotalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * wifeTotalIncome;
+    let wifePercentage = 1/(totalIncome - wifeIncome.childBenefits - husbandIncome.childBenefits) * wifeTotalIncome;
     console.log(wifePercentage, "wifePercentage");
 
     // D21 = B21 / (1 + B21)
